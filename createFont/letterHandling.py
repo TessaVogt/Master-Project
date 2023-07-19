@@ -93,7 +93,8 @@ def getImpCoords(handwritingCoords, fontCode):
             
             if distance < min_distance:
                 min_distance = distance
-                closest_coord = coord
+                coord_int = tuple(int(x) for x in coord)
+                closest_coord = coord_int
         
         impCoords.append(closest_coord)
     impCoordsCode = [tuple(fontCode[0])] + [(item[0], coord[0], coord[1]) for item, coord in zip(fontCode[1:], impCoords)]

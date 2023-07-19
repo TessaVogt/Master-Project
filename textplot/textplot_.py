@@ -340,4 +340,3 @@ if __name__ == "__main__":
         parser.add_argument("gCodeFile", help="Path to the output GCode file")
         args = parser.parse_args()
         main(args.defFile, args.fontFile, args.textFile, args.gCodeFile)
-        print("Execution completed successfully.")

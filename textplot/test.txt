@@ -1,13 +1,3 @@
-This project focuses on the development of a 
-system that uses the Anycubic i3 Mega 3D printer 
-to produce personalized text in a customized 
-handwriting font. The primary objective is to 
-employ the 3D printer as a plotter to accurately 
-write text in a specified font on a suitable 
-surface. Additionally, the focus lies on the 
-generation of a unique font that closely 
-resembles the user's own handwriting, using a 
-scan of the handwritten script as a foundation. 
-The result will be evaluated based on its 
-similarity to a human handwriting and how much
-it differs from a computer-generated handwriting.
+Hallo ich heisse Tessa.
+Dies ist ein Test der Original-
+Schriftart.
