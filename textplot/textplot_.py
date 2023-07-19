@@ -25,6 +25,22 @@ wFontScale = 100    # font scale
 wPlotSpeed = 500
 wEmptySpeed = 1000
 
+def writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile):
+    for wI in range(sFnt[bChr].wNum):
+        if wI == 0 or sPnt[sFnt[bChr].wOff + wI].bTyp == 'P':
+            # First point we always lift!
+            fgCodeFile.write("G1 F{:04d} Z{:05.3f}\n".format(wEmptySpeed, (wZoff + wLift) / 100.0))
+            wPlot += 1
+        elif wI > 0 and sPnt[sFnt[bChr].wOff + wI - 1].bTyp == 'P' and sPnt[sFnt[bChr].wOff + wI].bTyp == 'L':
+            # Move down if last point is lifted
+            fgCodeFile.write("G1 Z{:05.3f} F{:04d}\n".format(wZoff / 100.0, wPlotSpeed))
+            wPlot += 1
+
+        fgCodeFile.write("G1 Y{:05.3f} X{:05.3f}\n".format(fX + sPnt[sFnt[bChr].wOff + wI].nX * wFontScale / 100.0,
+                                                            fY - sPnt[sFnt[bChr].wOff + wI].nY * wFontScale / 100.0))
+        wPlot += 1
+        return wPlot
+
 
 def errorinfo():
     print("\n")
@@ -235,6 +251,50 @@ def main(defFile, fontFile, textFile, gCodeFile):
                         wPlot += 1
 
                     fX += sFnt[bChr].wWid * wFontScale / 100.0
+                # --------------------------------------------------------------------------
+                else: # char not defined
+                    if bChr == 132: # ä
+                        bChr_list = [97, 101] # a, e
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+                                
+                    elif bChr == 148: # ö
+                        bChr_list = [111, 101] # o, e
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+                    
+                    elif bChr == 129: # ü
+                        bChr_list = [117, 101] # u, e
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+                    
+                    elif bChr == 142: # Ä
+                        bChr_list = [65, 101] # A, e
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+                    
+                    elif bChr == 153: # Ö
+                        bChr_list = [79, 101] # O, e
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+
+                    elif bChr == 154: # Ü
+                        bChr_list = [85, 101] # U, e
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+
+                    elif bChr == 225: # ß
+                        bChr_list = [115, 115] # s, s
+                        for bChr in bChr_list:
+                            if sFnt[bChr].wWid:  # The char is defined
+                                wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
+                # --------------------------------------------------------------------------
                 wChar += 1
 
                 if bChr == 32:
