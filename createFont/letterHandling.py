@@ -15,10 +15,10 @@ def getHandwritingCoords(image_path, capital_letter):
     red_channel = image_array[:, :, 0]
     green_channel = image_array[:, :, 1]
     blue_channel = image_array[:, :, 2]
-    alpha_channel = image_array[:, :, 3]
+    # alpha_channel = image_array[:, :, 3]
 
     # Create a binary image by selecting only the black pixels
-    binary_image = (red_channel == 0) & (green_channel == 0) & (blue_channel == 0) & (alpha_channel != 0)
+    binary_image = (red_channel == 0) & (green_channel == 0) & (blue_channel == 0) # & (alpha_channel != 0)
     # Flip the image vertically
     flipped_image = np.flipud(binary_image)
 
@@ -54,7 +54,7 @@ def getHandwritingCoords(image_path, capital_letter):
         if y > max_y:
             max_y = y
 
-    if capital_letter == 1:
+    if capital_letter is True:
         max = 58
     else:
         max = 38

@@ -1,4 +1,5 @@
 import sys
+import os
 
 class StrFnt:
     def __init__(self):
@@ -92,16 +93,15 @@ def parse_font_file(font_path):
 
 
 
-def getLetterCoords(letter, sFnt, sPnt):
-    ascii_num = ord(letter)
+def getLetterCoords(ascii_num, sFnt, sPnt):
     letter_coords = []
 
     if ascii_num < 32 or (ascii_num > 127 and ascii_num < 160) or ascii_num > 255:
-        sys.stderr.write("Invalid character '{}'\n".format(letter))
+        sys.stderr.write("Invalid character '{}'\n".format(ascii_num))
         return letter_coords
 
     if sFnt[ascii_num].wNum == 0:
-        sys.stderr.write("Character '{}' not found\n".format(letter))
+        sys.stderr.write("Character '{}' not found\n".format(ascii_num))
         return letter_coords
 
     width = sFnt[ascii_num].wWid
@@ -118,8 +118,8 @@ def getLetterCoords(letter, sFnt, sPnt):
     return letter_coords
 
 
-def writeLetterCoords(coordsCode):
-    with open("handwriting.fnt", "w") as f:
+def writeLetterCoords(coordsCode, folder_name):
+    with open("handwriting_" + folder_name + ".fnt", "a+") as f:
         first_entry = coordsCode[0]
         ascii_char = first_entry[1]
         f.write("! >{}<\n".format(chr(ascii_char)))
@@ -127,3 +127,84 @@ def writeLetterCoords(coordsCode):
         for entry in coordsCode:
             letter, x, y = entry
             f.write("{} {} {}\n".format(letter, x, y))
+    return True
+
+
+
+def extract_file_info(folder_path, folder_name):
+    # Create the path to the folder
+    subfolder_path = os.path.join(folder_path, folder_name)
+
+    file_info_list = []
+
+    # Browse all files in the folder
+    for file in os.listdir(subfolder_path):
+        file_path = os.path.join(subfolder_path, file)
+
+        # Check if it is a file
+        if os.path.isfile(file_path) and file.lower().endswith(('.png', '.jpeg', '.jpg')):
+            # Check which abbreviation is present in the file name
+            capital_letter = False
+            if "_uc_" in file:
+                category = "_uc_"
+                capital_letter = True
+            elif "_lc_" in file:
+                category = "_lc_"
+            elif "_pm_" in file:
+                category = "_pm_"
+            elif "_digit_" in file:
+                category = "_digit_"
+            else:
+                raise ValueError("No Category Found")
+
+            # Extract the letter
+            file_name = os.path.splitext(file)[0]  # Filename without extension
+            if category in file_name:
+                letter = file_name.split(category, 1)[1]
+                try:
+                    letter_ascii = ord(letter)
+                except:
+                    if letter == "and":
+                        letter_ascii = 38
+                    elif letter == "hashtag":
+                        letter_ascii = 35
+                    elif letter == "hyphen":
+                        letter_ascii = 45
+                    elif letter == "open_parenthesis":
+                        letter_ascii = 40
+                    elif letter == "close_parenthesis":
+                        letter_ascii = 41
+                    elif letter == "euro":
+                        letter_ascii = 8364
+                    elif letter == "quotation_marks_above":
+                        letter_ascii = 34
+                    elif letter == "quotation_marks_below":
+                        letter_ascii = 44              # not existing
+                    elif letter == "at_sign":
+                        letter_ascii = 64
+                    elif letter == "exclamation_mark":
+                        letter_ascii = 33
+                    elif letter == "percent":
+                        letter_ascii = 37
+                    elif letter == "comma":
+                        letter_ascii = 44
+                    elif letter == "period":
+                        letter_ascii = 46
+                    elif letter == "question_mark":
+                        letter_ascii = 63
+                    elif letter == "simicolon":
+                        letter_ascii = 59
+                    elif letter == "colon":
+                        letter_ascii = 58
+
+                file_info = {
+                    "file": file,
+                    "letter": letter_ascii,
+                    "category": category,
+                    "capital_letter": capital_letter
+                }
+                file_info_list.append(file_info)
+            else:
+                raise ValueError("Category was not found in Filename")
+
+    return file_info_list
