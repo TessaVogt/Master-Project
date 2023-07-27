@@ -1,0 +1,60 @@
+import sqlite3
+import matplotlib.pyplot as plt
+
+def plot_coordinates_for_letter(letter, font_name):
+    # Verbindung zur Datenbank herstellen
+    conn = sqlite3.connect('instance/coords.db')
+    cursor = conn.cursor()
+
+    # Datenpunkte für den angegebenen Buchstaben abrufen
+    cursor.execute(f"SELECT x, y, created_at, new_line FROM creating_font WHERE letter = '{letter}' and font_name = '{font_name}'")
+    data = cursor.fetchall()
+    # print(data)
+
+    # Verbindung zur Datenbank schließen
+    conn.close()
+
+    # Koordinatenpunkte extrahieren
+    x_values = [point[0] for point in data]
+    y_values = [point[1] for point in data]
+    created_at_dates = [point[2] for point in data]
+    new_line_values = [point[3] for point in data]
+
+    # extrahiere letzte Eingabe
+    num_different_dates = len(set(created_at_dates))
+    last_date = max(created_at_dates)
+
+    print(f'Anzahl der verschiedenen Daten: {num_different_dates}')
+    print(f'Minimum Datum: {last_date}')
+
+    last_data = [point for point in data if point[2] == last_date]
+
+    last_x_values = [point[0] for point in last_data]
+    last_y_values = [point[1] for point in last_data]
+    last_created_at_dates = [point[2] for point in last_data]
+    last_new_line_values = [point[3] for point in last_data]
+
+    # new_line-Werte ausgeben 
+    new_line_indices = [i for i, point in enumerate(last_data) if point[3] == True]
+    num_lines = len(new_line_indices)
+    print(f'Anzahl an Strichen im Buchstabe {letter}: {num_lines}')
+    print(f'new_line-Indices für Buchstabe {letter}: {new_line_indices}')
+
+    # Koordinatenpunkte plotten
+    plt.scatter(last_x_values, last_y_values, label=letter, c='r')
+    for i in range(num_lines):
+        start = new_line_indices[i]
+        if i == (num_lines - 1):
+            end = len(last_x_values)
+        else:
+            end = new_line_indices[i+1] - 1
+        plt.plot(last_x_values[start:end], last_y_values[start:end], label=letter)
+    plt.gca().invert_yaxis()  # Hier wird die Y-Achse invertiert
+    plt.xlabel('X-Koordinate')
+    plt.ylabel('Y-Koordinate')
+    plt.title(f'Koordinatenpunkte für Buchstabe {letter}')
+    #plt.legend()
+    plt.show()
+
+# Beispiel: Koordinatenpunkte für den Buchstaben 'A' plotten
+plot_coordinates_for_letter('F', 'Test')

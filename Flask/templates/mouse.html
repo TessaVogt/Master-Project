@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mauszeichnung</title>
+</head>
+<style>
+    .button_lo1{
+        position: relative;
+        top: 30px;
+        left: 80px;
+    }
+    .button_lo2{
+        position: relative;
+        top: 100px;
+        left: 80px;
+    }
+    .canvas_lo{
+        position: relative;
+        left: 80px;
+        top: 100px;
+        /* Füge hier das Hintergrundbild ein */
+        background-image: url('canvas_background.png');
+        /* Optional: Passe die Größe und Wiederholung des Hintergrundbilds an */
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+    .nav_lo{
+        font-size: 20px;
+    }
+</style>
+<body>
+    <nav class="navbar bg-body-tertiary nav_lo">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Font Creater</a>
+        </div>
+    </nav>
+
+    <form class="input-group mb-3 button_lo1" method="POST">
+        <input type="text" id="font-name-input" class="form-control" placeholder="Font Name" aria-label="Font Name" aria-describedby="button-addon2">
+        <input type="text" id="letter-input" class="letter-input" placeholder="Letter" data-points="[]" aria-describedby="button-addon2">
+        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="saveCoordinates()">Save</button>
+        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="eraseCanvas()">Erase</button>
+    </form>
+    
+    <div class="canvas-container canvas_lo">
+        <canvas id="canvas" width="500" height="290" style="border: 1px solid black;"></canvas>
+    </div>
+    
+
+<script>
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let points = [];
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+        points.push({ x: lastX, y: lastY, isNewLine: true }); // isNewLine für den Punkt setzen
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+
+        drawLetter(e.offsetX, e.offsetY);
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+        points.push({ x: lastX, y: lastY, isNewLine: false }); // isNewLine für den Punkt setzen
+        });
+
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+    });
+
+    function drawLetter(x, y) {
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+
+    function saveCoordinates() {
+        let letterInput = document.querySelector('.letter-input');
+        let letter = letterInput.value;
+
+        // Lese den Tabellennamen aus dem Eingabefeld aus
+        fontNameInput = document.getElementById('font-name-input');
+        let fontName = fontNameInput.value;
+
+        console.log(fontName); // Überprüfe, ob der Tabellenname korrekt ist
+        console.log(letter); // Überprüfe, ob der Buchstabe korrekt ist
+        console.log(points); // Überprüfe, ob die Koordinaten korrekt sind
+
+        let newLine = isDrawing;
+
+        fetch('/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ font_name: fontName, letter: letter, points: points, new_line: newLine })
+        })
+        .then(response => response.json())
+        .then(data => console.log(data));
+
+        // Zurücksetzen der Punkte nach dem Speichern
+        points = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function eraseCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Zurücksetzen der Punkte ohne den Buchstaben zu speichern
+        points = [];
+    }
+</script>
+</body>
+</html>
