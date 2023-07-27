@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tracked Letters</title>
+</head>
+<body>
+    <h1>Tracked Letters for Font: {{ font_name }}</h1>
+    <ul>
+        {% for letter in tracked_letters %}
+            <li>{{ letter[0] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

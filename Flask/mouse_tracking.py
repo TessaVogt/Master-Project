@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import sqlite3
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coords.db'
@@ -21,6 +22,7 @@ def create_table_if_not_exists():
         with app.app_context():
             db.create_all()
 
+
 @app.route('/mouse_tracking')
 def tracking():
     return render_template('mouse.html')
@@ -28,7 +30,7 @@ def tracking():
 @app.route('/save', methods=['POST'])
 def save_coordinates():
     data = request.json
-    print("Received data:", data)  # Debug-Ausgabe
+    # print("Received data:", data)  # Debug-Ausgabe
     font_name = data['font_name']
     letter = data['letter']
     points = data['points']
@@ -45,6 +47,15 @@ def save_coordinates():
     db.session.commit()
 
     return jsonify({'message': 'Koordinaten gespeichert'})
+
+@app.route('/tracked_letters', methods=['GET'])
+def tracked_letters():
+    font_name_input = request.args.get('font_name', '')  # Get the font name from the query string
+    tracked_letters = db.session.query(CreatingFont.letter).filter_by(font_name=font_name_input).distinct().all()
+    tracked_letters = [letter[0] for letter in tracked_letters]
+    print(tracked_letters)
+    return jsonify(tracked_letters)
+
 
 if __name__ == '__main__':
     with app.app_context():

@@ -14,10 +14,15 @@
         top: 100px;
         left: 80px;
     }
+    .output_lo{
+        position: relative;
+        top: 80px;
+        left: 80px;
+    }
     .canvas_lo{
         position: relative;
         left: 80px;
-        top: 100px;
+        top: 60px;
         /* Füge hier das Hintergrundbild ein */
         background-image: url('canvas_background.png');
         /* Optional: Passe die Größe und Wiederholung des Hintergrundbilds an */
@@ -43,8 +48,16 @@
     </form>
     
     <div class="canvas-container canvas_lo">
+        <h5>Schreibe hier in dieses Feld mit der Maus den Buchstaben hinein</h5>
         <canvas id="canvas" width="500" height="290" style="border: 1px solid black;"></canvas>
     </div>
+
+    <!-- Display the tracked letters in a text field -->
+    <div class="mb-3 output_lo">
+        <h5>Bereits hinzugefügte Buchstaben</h5>
+        <textarea id="tracked-letters" class="form-control" rows="10" readonly></textarea>
+    </div>
+    
     
 
 <script>
@@ -104,7 +117,13 @@
             body: JSON.stringify({ font_name: fontName, letter: letter, points: points, new_line: newLine })
         })
         .then(response => response.json())
-        .then(data => console.log(data));
+        .then(data => {
+            console.log(data);
+            // Nachdem die Daten gespeichert wurden, rufe fetchTrackedLetters auf
+            fetchTrackedLetters();
+        })
+        .catch(error => console.error('Error saving coordinates:', error));
+
 
         // Zurücksetzen der Punkte nach dem Speichern
         points = [];
@@ -116,6 +135,20 @@
         // Zurücksetzen der Punkte ohne den Buchstaben zu speichern
         points = [];
     }
+
+    function fetchTrackedLetters() {
+        let fontNameInput = document.getElementById('font-name-input').value;
+        fetch(`/tracked_letters?font_name=${fontNameInput}`)
+            .then(response => response.json())
+            .then(data => {
+                let trackedLettersInput = document.getElementById('tracked-letters');
+                trackedLettersInput.value = data.join(', ');
+            })
+            .catch(error => console.error('Error fetching tracked letters:', error));
+    }
+
+    // Rufe die Funktion einmal auf, um die Buchstaben beim Laden der Seite anzuzeigen
+    // updateTrackedLetters();
 </script>
 </body>
 </html>
