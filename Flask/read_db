@@ -1,7 +1,7 @@
 import sqlite3
 import matplotlib.pyplot as plt
 
-def plot_coordinates_for_letter(letter, font_name):
+def get_coordinates_for_letter(letter, font_name):
     # Verbindung zur Datenbank herstellen
     conn = sqlite3.connect('instance/coords.db')
     cursor = conn.cursor()
@@ -36,25 +36,41 @@ def plot_coordinates_for_letter(letter, font_name):
 
     # new_line-Werte ausgeben 
     new_line_indices = [i for i, point in enumerate(last_data) if point[3] == True]
-    num_lines = len(new_line_indices)
-    print(f'Anzahl an Strichen im Buchstabe {letter}: {num_lines}')
     print(f'new_line-Indices für Buchstabe {letter}: {new_line_indices}')
+    return new_line_indices, last_x_values, last_y_values, letter
 
-    # Koordinatenpunkte plotten
-    plt.scatter(last_x_values, last_y_values, label=letter, c='r')
-    for i in range(num_lines):
-        start = new_line_indices[i]
-        if i == (num_lines - 1):
-            end = len(last_x_values)
-        else:
-            end = new_line_indices[i+1] - 1
-        plt.plot(last_x_values[start:end], last_y_values[start:end], label=letter)
-    plt.gca().invert_yaxis()  # Hier wird die Y-Achse invertiert
-    plt.xlabel('X-Koordinate')
-    plt.ylabel('Y-Koordinate')
-    plt.title(f'Koordinatenpunkte für Buchstabe {letter}')
-    #plt.legend()
-    plt.show()
+
+def plot_subplot(ax, new_line_indices, last_x_values, last_y_values, letter):
+    # ax.scatter(last_x_values, last_y_values, label=letter, c='r')
+    num_lines = len(new_line_indices)
+    if num_lines != []:
+        for i in range(num_lines):
+            start = new_line_indices[i]
+            if i == (num_lines - 1):
+                end = len(last_x_values)
+            else:
+                end = new_line_indices[i+1] - 1
+            ax.plot(last_x_values[start:end], last_y_values[start:end], label=letter)
+    else:
+        ax.plot(last_x_values, last_y_values, label=letter)
+
+    ax.invert_yaxis()  # Hier wird die Y-Achse invertiert
+    ax.set_xlabel('X-Koordinate')
+    ax.set_ylabel('Y-Koordinate')
+    ax.set_title(f'Koordinatenpunkte für Buchstabe {letter}')
+    ax.set_ylim(300, -20)
+    ax.set_xlim(0, 800)
 
 # Beispiel: Koordinatenpunkte für den Buchstaben 'A' plotten
-plot_coordinates_for_letter('F', 'Test')
+asciiList = [chr(i) for i in range(33, 36)] + [chr(37), chr(38)] + [chr(i) for i in range(40, 42)] + [chr(i) for i in range(43, 60)] + [chr(i) for i in range(63, 91)] + [chr(95)] + [chr(i) for i in range(97, 123)] + [chr(196), chr(214), chr(220), chr(223), chr(228), chr(246), chr(252)]
+for k in range(3):    
+    fig, axs = plt.subplots(4, 3, figsize=(15, 10))
+    for i, char in enumerate(asciiList[(k*12):((k+1)*12)]):
+        new_line_indices, last_x_values, last_y_values, letter = get_coordinates_for_letter(char, 'Test')
+        plot_subplot(axs[i//3, i%3], new_line_indices, last_x_values, last_y_values, letter)
+
+    # Platz zwischen den Plots hinzufügen, falls gewünscht
+    plt.tight_layout()
+
+    # Zeige den Subplot
+    plt.show()

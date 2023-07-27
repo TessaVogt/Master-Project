@@ -23,15 +23,22 @@
         position: relative;
         left: 80px;
         top: 60px;
-        /* Füge hier das Hintergrundbild ein */
-        background-image: url('canvas_background.png');
+        /* Füge hier das Hintergrundbild ein 
+        background-image: url(C:\Users\tvogt\OneDrive\Dokumente\GitHub\Master-Project\Flask\templates\canvas_background1.png);*/
+        background-image: url("/static/images/canvas_background1.png");
         /* Optional: Passe die Größe und Wiederholung des Hintergrundbilds an */
         background-size: contain;
         background-repeat: no-repeat;
     }
     .nav_lo{
-        font-size: 20px;
+        font-size: 30px;
     }
+
+    /* Setze die Farbe für die verfolgten Buchstaben */
+    .tracked-letter {
+        color: green;
+    }
+
 </style>
 <body>
     <nav class="navbar bg-body-tertiary nav_lo">
@@ -41,21 +48,21 @@
     </nav>
 
     <form class="input-group mb-3 button_lo1" method="POST">
-        <input type="text" id="font-name-input" class="form-control" placeholder="Font Name" aria-label="Font Name" aria-describedby="button-addon2">
+        <input type="text" id="font-name-input" class="form-control" placeholder="Font Name" aria-label="Font Name" aria-describedby="button-addon2" oninput="fetchTrackedLetters()">
         <input type="text" id="letter-input" class="letter-input" placeholder="Letter" data-points="[]" aria-describedby="button-addon2">
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="saveCoordinates()">Save</button>
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="eraseCanvas()">Erase</button>
     </form>
     
     <div class="canvas-container canvas_lo">
-        <h5>Schreibe hier in dieses Feld mit der Maus den Buchstaben hinein</h5>
-        <canvas id="canvas" width="500" height="290" style="border: 1px solid black;"></canvas>
+        <h3>Schreibe hier in dieses Feld mit der Maus den Buchstaben hinein</h3>
+        <canvas id="canvas" width="580" height="290" style="border: 1px solid black;"></canvas>
     </div>
 
     <!-- Display the tracked letters in a text field -->
     <div class="mb-3 output_lo">
-        <h5>Bereits hinzugefügte Buchstaben</h5>
-        <textarea id="tracked-letters" class="form-control" rows="10" readonly></textarea>
+        <h3>Bereits hinzugefügte Buchstaben</h3>
+        <div id="tracked-letters"></div>
     </div>
     
     
@@ -141,14 +148,60 @@
         fetch(`/tracked_letters?font_name=${fontNameInput}`)
             .then(response => response.json())
             .then(data => {
-                let trackedLettersInput = document.getElementById('tracked-letters');
-                trackedLettersInput.value = data.join(', ');
+                let trackedLettersDiv = document.getElementById('tracked-letters');
+                let trackedLetters = data;
+                console.log(trackedLetters);
+
+                let outputText = '';
+                let foundAll = true;
+
+                let asciiList = [];
+                for (let i = 33; i <= 35; i++) {
+                    asciiList.push(i);
+                }
+                asciiList.push(37);
+                asciiList.push(38);
+                for (let i = 40; i <= 41; i++) {
+                    asciiList.push(i);
+                }
+                for (let i = 43; i <= 59; i++) {
+                    asciiList.push(i);
+                }
+                for (let i = 63; i <= 90; i++) {
+                    asciiList.push(i);
+                }
+                asciiList.push(95);
+                for (let i = 97; i <= 122; i++) {
+                    asciiList.push(i);
+                }
+                // asciiList.push(128); //€
+                asciiList.push(196);
+                asciiList.push(214);
+                asciiList.push(220);
+                asciiList.push(223);
+                asciiList.push(228);
+                asciiList.push(246);
+                asciiList.push(252);
+
+
+                for (let num of asciiList) {
+                    let letter = String.fromCharCode(num);
+                    if (trackedLetters.includes(letter)) {
+                        outputText += `<span class="tracked-letter">${letter}</span>`;
+                        console.log("Found");
+                    } else {
+                        outputText += `<span>${letter}</span>`;
+                        foundAll = false;
+                    }
+                }
+                let finish = foundAll ? " Alle Buchstaben wurden hinzugefügt!" : "";
+                trackedLettersDiv.innerHTML = outputText + "<br>" + finish;
             })
             .catch(error => console.error('Error fetching tracked letters:', error));
     }
 
-    // Rufe die Funktion einmal auf, um die Buchstaben beim Laden der Seite anzuzeigen
-    // updateTrackedLetters();
+
+
 </script>
 </body>
 </html>

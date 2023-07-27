@@ -2,12 +2,22 @@
 <html>
 <head>
     <title>Tracked Letters</title>
+    <style>
+        .tracked-letter {
+            font-size: 12px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Tracked Letters for Font: {{ font_name }}</h1>
     <ul>
         {% for letter in tracked_letters %}
-            <li>{{ letter[0] }}</li>
+            {% if letter in tracked_letters_db %}
+                <span class="tracked-letter" style="color: green;">{{ letter }}</span>
+            {% else %}
+                <span class="tracked-letter" style="color: black;">{{ letter }}</span>
+            {% endif %}
         {% endfor %}
     </ul>
 </body>
