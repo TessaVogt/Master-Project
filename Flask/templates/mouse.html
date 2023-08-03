@@ -246,24 +246,33 @@
 
                 // Show or hide the plot container based on "foundAll" value
                 if (foundAll) {
-                    document.getElementById('plot-container').style.display = 'block';
-
-                    // Update the image src with the font_name
-                    let fontPlot = document.getElementById('font_plot'); // Update the ID to 'font_plot'
-                    fontPlot.src = `/static/images/${fontNameInput}_plot.png`;
-                    fontPlot.alt = fontNameInput;
-
                     // Show the "Kontrolliere" button when all letters are added
                     document.getElementById('kontrolliereBtn').style.display = 'block';
                 } else {
-                    document.getElementById('plot-container').style.display = 'none';
-
                     // Hide the "Kontrolliere" button when not all letters are added
                     document.getElementById('kontrolliereBtn').style.display = 'none';
                 }
             })
             .catch(error => console.error('Error fetching tracked letters:', error));
     }
+
+    function checkLetters() {
+        let fontNameInput = document.getElementById('font-name-input').value;
+        
+        fetch(`/create_plot?font_name=${fontNameInput}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update the image src with the new font plot
+                let fontPlot = document.getElementById('font_plot');
+                fontPlot.src = data.plot_path; // Annahme: data.plot_path enthält den Pfad zum neuen Plot
+                fontPlot.alt = fontNameInput;
+                
+                // Display the plot container
+                document.getElementById('plot-container').style.display = 'block';
+            })
+            .catch(error => console.error('Error checking letters:', error));
+    }
+
 
 
 </script>

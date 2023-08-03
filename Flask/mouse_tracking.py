@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import show_db
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coords.db'
@@ -32,6 +33,8 @@ def save_coordinates():
     # print("Received data:", data)  # Debug-Ausgabe
     font_name = data['font_name']
     letter = data['letter']
+    if ord(letter) == 8220:
+        letter = chr(34)
     points = data['points']
 
     create_table_if_not_exists()
@@ -54,6 +57,16 @@ def tracked_letters():
     tracked_letters = [letter[0] for letter in tracked_letters]
     print(tracked_letters)
     return jsonify(tracked_letters)
+
+
+@app.route('/create_plot', methods=['GET'])
+def create_plot():
+    font_name = request.args.get('font_name')
+
+    plot_path = show_db.main(font_name)
+
+    # Annahme: plot_path enthält den Pfad zum generierten Plot
+    return jsonify({'plot_path': plot_path})
 
 
 if __name__ == '__main__':

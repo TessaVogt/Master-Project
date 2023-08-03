@@ -55,7 +55,7 @@ def plot_subplot(ax, new_line_indices, data_last_letter, letter):
 
 
 
-def show_db(font_name):
+def main(font_name):
     data = get_data_from_db(font_name, 'instance/coords.db')
     asciiList = [chr(i) for i in range(33, 36)] + [chr(37), chr(38)] + [chr(i) for i in range(40, 42)] + [chr(i) for i in range(43, 60)] + [chr(i) for i in range(63, 91)] + [chr(95)] + [chr(i) for i in range(97, 123)] + [chr(196), chr(214), chr(220), chr(223), chr(228), chr(246), chr(252)]
     fig, axs = plt.subplots(10, 9, figsize=(10, 10))
@@ -67,11 +67,8 @@ def show_db(font_name):
     plt.tight_layout()
 
     # save Plot
-    plt.savefig(f'static\images\{font_name}_plot.png')
+    plot_path = f'static\images\{font_name}_plot.png'
+    plt.savefig(plot_path)
+    # plt.show()
+    return plot_path
 
-    # Zeige den Subplot
-    plt.show()
-
-if __name__ == "__main__":
-    font_name = 'Test'
-    show_db(font_name)
