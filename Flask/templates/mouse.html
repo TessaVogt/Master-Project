@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Mauszeichnung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <style>
     .button_lo1{
@@ -30,6 +31,14 @@
         background-size: contain;
         background-repeat: no-repeat;
     }
+
+    .image-container{
+        display: none; /* Hide the container by default */
+        position: absolute;
+        top: 110px;
+        right: 70px; /* Adjust the left position as needed */
+    }
+
     .nav_lo{
         font-size: 30px;
     }
@@ -51,7 +60,7 @@
         <input type="text" id="font-name-input" class="form-control" placeholder="Font Name" aria-label="Font Name" aria-describedby="button-addon2" oninput="fetchTrackedLetters()">
         <input type="text" id="letter-input" class="letter-input" placeholder="Letter" data-points="[]" aria-describedby="button-addon2">
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="saveCoordinates()">Save</button>
-        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="eraseCanvas()">Erase</button>
+        <button class="btn btn-outline-secondary" type="button" id="button-addon3" onclick="eraseCanvas()">Erase</button>
     </form>
     
     <div class="canvas-container canvas_lo">
@@ -59,10 +68,16 @@
         <canvas id="canvas" width="580" height="290" style="border: 1px solid black;"></canvas>
     </div>
 
+    <div class="image-container" id="plot-container">
+        <img id="font_plot" src="/static/images/Test_plot.png" alt="Plot" width="500" height="500">
+    </div>
+
     <!-- Display the tracked letters in a text field -->
     <div class="mb-3 output_lo">
         <h3>Bereits hinzugefügte Buchstaben</h3>
         <div id="tracked-letters"></div>
+        <!-- Add the "Kontrolliere" button here -->
+        <button class="btn btn-primary" id="kontrolliereBtn" style="display: none;" onclick="checkLetters()">Kontrolliere</button>
     </div>
     
     
@@ -196,10 +211,27 @@
                 }
                 let finish = foundAll ? " Alle Buchstaben wurden hinzugefügt!" : "";
                 trackedLettersDiv.innerHTML = outputText + "<br>" + finish;
+
+                // Show or hide the plot container based on "foundAll" value
+                if (foundAll) {
+                    document.getElementById('plot-container').style.display = 'block';
+
+                    // Update the image src with the font_name
+                    let fontPlot = document.getElementById('font_plot'); // Update the ID to 'font_plot'
+                    fontPlot.src = `/static/images/${fontNameInput}_plot.png`;
+                    fontPlot.alt = fontNameInput;
+
+                    // Show the "Kontrolliere" button when all letters are added
+                    document.getElementById('kontrolliereBtn').style.display = 'block';
+                } else {
+                    document.getElementById('plot-container').style.display = 'none';
+
+                    // Hide the "Kontrolliere" button when not all letters are added
+                    document.getElementById('kontrolliereBtn').style.display = 'none';
+                }
             })
             .catch(error => console.error('Error fetching tracked letters:', error));
     }
-
 
 
 </script>
