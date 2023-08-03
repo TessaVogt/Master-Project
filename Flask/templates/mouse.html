@@ -90,12 +90,33 @@
     let lastY = 0;
     let points = [];
 
-    canvas.addEventListener('mousedown', (e) => {
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('touchstart', startDrawing);
+
+    canvas.addEventListener('mouseup', handleEnd);
+    canvas.addEventListener('touchend', handleEnd);
+
+    function startDrawing(e) {
+        e.preventDefault(); // Verhindere das Standard-Touch-Verhalten (z.B. Scrollen)
         isDrawing = true;
-        lastX = e.offsetX;
-        lastY = e.offsetY;
-        points.push({ x: lastX, y: lastY, isNewLine: true }); // isNewLine für den Punkt setzen
-    });
+        const { x, y } = getEventCoordinates(e);
+        lastX = x;
+        lastY = y;
+        points.push({ x, y, isNewLine: true });
+    }
+
+    function getEventCoordinates(e) {
+        if (e.type === 'mousedown') {
+            return { x: e.offsetX, y: e.offsetY };
+        } else if (e.type === 'touchstart' || e.type === 'touchmove') {
+            const touch = e.touches[0];
+            return { x: touch.clientX - canvas.getBoundingClientRect().left, y: touch.clientY - canvas.getBoundingClientRect().top };
+        }
+    }
+
+    function handleEnd() {
+        isDrawing = false;
+    }
 
     canvas.addEventListener('mousemove', (e) => {
         if (!isDrawing) return;
@@ -104,18 +125,29 @@
         lastX = e.offsetX;
         lastY = e.offsetY;
         points.push({ x: lastX, y: lastY, isNewLine: false }); // isNewLine für den Punkt setzen
-        });
-
-    canvas.addEventListener('mouseup', () => {
-        isDrawing = false;
     });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Verhindere das Standard-Touch-Verhalten (z.B. Scrollen)
+        if (!isDrawing) return;
+
+        const { x, y } = getEventCoordinates(e);
+
+        drawLetter(x, y);
+        points.push({ x, y, isNewLine: false });
+    });
+
 
     function drawLetter(x, y) {
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(x, y);
         ctx.stroke();
+
+        lastX = x;
+        lastY = y;
     }
+
 
     function saveCoordinates() {
         let letterInput = document.querySelector('.letter-input');
