@@ -68,6 +68,7 @@
         <canvas id="canvas" width="580" height="290" style="border: 1px solid black;"></canvas>
     </div>
 
+
     <div class="image-container" id="plot-container">
         <img id="font_plot" src="/static/images/Test_plot.png" alt="Plot" width="500" height="500">
     </div>
@@ -78,11 +79,14 @@
         <div id="tracked-letters"></div>
         <!-- Add the "Kontrolliere" button here -->
         <button class="btn btn-primary" id="kontrolliereBtn" style="display: none;" onclick="checkLetters()">Kontrolliere</button>
+        <button class="btn btn-primary" id="AddTextBtn" style="display: none;" onclick="addText()">Hier klicken, um Satzbeispiele hinzuzufügen</button>
+        
     </div>
     
     
 
 <script>
+    // für ersten Canvas
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
     let isDrawing = false;
@@ -95,6 +99,7 @@
 
     canvas.addEventListener('mouseup', handleEnd);
     canvas.addEventListener('touchend', handleEnd);
+
 
     function startDrawing(e) {
         e.preventDefault(); // Verhindere das Standard-Touch-Verhalten (z.B. Scrollen)
@@ -150,8 +155,9 @@
 
 
     function saveCoordinates() {
-        let letterInput = document.querySelector('.letter-input');
+        let letterInput = document.getElementById('letter-input');
         let letter = letterInput.value;
+
 
         // Lese den Tabellennamen aus dem Eingabefeld aus
         fontNameInput = document.getElementById('font-name-input');
@@ -162,6 +168,10 @@
         console.log(points); // Überprüfe, ob die Koordinaten korrekt sind
 
         let newLine = isDrawing;
+
+        // Hier fügst du JavaScript-Code ein
+        console.log("Jetzt soll gespeichet werden");
+
 
         fetch('/save', {
             method: 'POST',
@@ -186,6 +196,7 @@
 
     function eraseCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        console.log("Jetzt soll das gemalte auf dem Canvas gelöscht werden");
         // Zurücksetzen der Punkte ohne den Buchstaben zu speichern
         points = [];
     }
@@ -269,10 +280,20 @@
                 
                 // Display the plot container
                 document.getElementById('plot-container').style.display = 'block';
+                document.getElementById('AddTextBtn').style.display = 'block';
             })
             .catch(error => console.error('Error checking letters:', error));
     }
 
+    
+
+    function addText() {
+        // öffne neue seite zum Textinput eingeben für selben User
+        let fontNameInput = document.getElementById('font-name-input').value;
+        window.location.href = "/mouse_tracking/text_input?fontname=" + encodeURIComponent(fontNameInput);
+        
+
+    }
 
 
 </script>

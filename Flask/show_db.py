@@ -1,14 +1,26 @@
 import sqlite3
 import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
 
 
 
-def get_data_from_db(font_name, db_path):
+def get_letterdata_from_db(font_name, db_path):
     # Verbindung zur Datenbank herstellen
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     # Datenpunkte für den angegebenen Buchstaben abrufen
     cursor.execute(f"SELECT letter, created_at, new_line, x, y FROM creating_font WHERE font_name = '{font_name}'")
+    data = cursor.fetchall()
+    # Verbindung zur Datenbank schließen
+    conn.close()
+    return data
+
+def get_sampletextdata_from_db(font_name, db_path):
+    # Verbindung zur Datenbank herstellen
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    # Datenpunkte für den angegebenen Buchstaben abrufen
+    cursor.execute(f"SELECT text_sample, created_at, new_line, x, y FROM text_samples WHERE font_name = '{font_name}'")
     data = cursor.fetchall()
     # Verbindung zur Datenbank schließen
     conn.close()
@@ -26,6 +38,25 @@ def get_data_for_letter(data, letter):
     # entferne die spalten mit letter und created_at und new_line
     data_last_letter = [point[3:] for point in data_last_letter]
     return new_line_indices, data_last_letter
+
+
+def get_data_for_textsample(data, text_sample):
+    data_sampletext = [point for point in data if point[0] == text_sample]
+    # extrahiere letzte Eingabe
+    created_at_dates = [point[1] for point in data_sampletext]
+    last_date_str = max(created_at_dates)
+    last_datetime = datetime.strptime(last_date_str, '%Y-%m-%d %H:%M:%S.%f')
+    # Definiere den Zeitbereich
+    time_range = timedelta(minutes=10)
+    lower_bound = last_datetime - time_range
+    # Extrahiere alle Daten nach dem unteren Zeitlimit
+    data_last = [point for point in data_sampletext if datetime.strptime(point[1], '%Y-%m-%d %H:%M:%S.%f') >= lower_bound]
+    # new_line-Werte ausgeben 
+    new_line_indices = [i for i, point in enumerate(data_last) if point[2] == True]
+    # entferne die spalten mit sampletext und created_at und new_line
+    data_last = [point[3:] for point in data_last]
+    return new_line_indices, data_last
+
 
 
 def plot_subplot(ax, new_line_indices, data_last_letter, letter):
@@ -56,7 +87,7 @@ def plot_subplot(ax, new_line_indices, data_last_letter, letter):
 
 
 def main(font_name):
-    data = get_data_from_db(font_name, 'instance/coords.db')
+    data = get_letterdata_from_db(font_name, 'instance/coords.db')
     asciiList = [chr(i) for i in range(33, 36)] + [chr(37), chr(38)] + [chr(i) for i in range(40, 42)] + [chr(i) for i in range(43, 60)] + [chr(i) for i in range(63, 91)] + [chr(95)] + [chr(i) for i in range(97, 123)] + [chr(196), chr(214), chr(220), chr(223), chr(228), chr(246), chr(252)]
     fig, axs = plt.subplots(10, 9, figsize=(10, 10))
     for i, char in enumerate(asciiList):

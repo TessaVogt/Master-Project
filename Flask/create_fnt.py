@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, timedelta
 
 def get_data_from_db(font_name, db_path):
     # Verbindung zur Datenbank herstellen
@@ -11,28 +12,28 @@ def get_data_from_db(font_name, db_path):
     conn.close()
     return data
 
-def remove_close_points(data):
-    filtered_data = [data[0]]  # Keep the first point as it is
-    for i in range(1, len(data)):
-        x1, y1 = data[i - 1][1], data[i - 1][2]
-        x2, y2 = data[i][1], data[i][2]
-        distance = pow(pow((x2 - x1), 2) + pow((y2 - y1), 2), 0.5)
-        if i == 1 or data[i][0] == True or data[i-1][0] == True or distance >= 3:
-            filtered_data.append(data[i])
-    return filtered_data
-
 
 def get_data_for_letter(data, letter):
     data_letter = [point for point in data if point[0] == letter]
     # extrahiere letzte Eingabe
-    created_at_dates = [point[1] for point in data_letter]
+    created_at_dates = [point[1].split('.')[0] for point in data_letter]
     last_date = max(created_at_dates)
-    data_last_letter = [point for point in data_letter if point[1] == last_date]
+    
+    # Filtere alle Punkte mit der gleichen created_at-Zeit (ohne Millisekunden)
+    data_last_letter = [point for point in data_letter if point[1].split('.')[0] == last_date]
+  
     # entferne die spalten mit letter und created_at
     data_last_letter = [point[2:] for point in data_last_letter]
-    # lösche datenpunkte, die zu nah aufeinander folgen
-    filtered_data_last_letter = remove_close_points(data_last_letter)
-    return filtered_data_last_letter
+    return data_last_letter
+
+
+def remove_double_points(data):
+    filtered_data = [data[0]]  # Keep the first point as it is
+    for i in range(1, len(data)):
+        if data[i] != filtered_data[-1]:
+            filtered_data.append(data[i])
+    return filtered_data
+
 
 def scale_letter(data):
     # move to new zero point
@@ -52,8 +53,8 @@ def scale_letter(data):
     # Overwrite x_values and y_values with scaled values
     for i, point in enumerate(data):
         data[i] = (point[0], scaled_x_values[i], scaled_y_values[i])
-
-    return data
+    removed_data = remove_double_points(data)
+    return removed_data
 
 
 def create_font_input(data, letter):
@@ -89,9 +90,10 @@ def write_letter_to_file(coordsCode, font_name):
 
 if __name__ == "__main__":
     db_path = 'instance/coords.db'
-    font_name = "Test"
+    font_name = "Ipad"
     data = get_data_from_db(font_name, db_path)
     prepare_fontfile(font_name)
+    # asciiList = ["a"]
     asciiList = [chr(i) for i in range(33, 36)] + [chr(37), chr(38)] + [chr(i) for i in range(40, 42)] + [chr(i) for i in range(43, 60)] + [chr(i) for i in range(63, 91)] + [chr(95)] + [chr(i) for i in range(97, 123)] + [chr(196), chr(214), chr(220), chr(223), chr(228), chr(246), chr(252)]
     for char in asciiList:
         data_last_letter = get_data_for_letter(data, char)

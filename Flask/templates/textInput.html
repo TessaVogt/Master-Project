@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mauszeichnung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+</head>
+<style>
+    .canvas_lo{
+        position: relative;
+        left: 0px;
+        top: 0px;
+        /* Füge hier das Hintergrundbild ein 
+        background-image: url(C:\Users\tvogt\OneDrive\Dokumente\GitHub\Master-Project\Flask\templates\canvas_background1.png);*/
+        background-image: url("/static/images/linien_hintergund_canvas_gross.jpg");
+        /* Optional: Passe die Größe und Wiederholung des Hintergrundbilds an */
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+
+</style>
+<body>
+    <nav class="navbar bg-body-tertiary nav_lo">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Font Creator / Text Input</a>
+        </div>
+    </nav>
+
+
+    <p class="text-start">Textsample 1:<br>Die Kinder spielten fröhlich im nahegelegenen Park, während die Vögel zwitschernd ihre Lieder trällerten. Am Abend versammelten sich die Bewohner in der kleinen Bäckerei und genossen gemeinsam die schöne Stimmung.<br><br> </p>
+    
+    <h3>Bitte schreibe hier den überstehenden Text rein.</h3>
+    <div class="canvas-container canvas_lo">
+        <canvas id="canvas" width="1180" height="870" style="border: 1px solid black;"></canvas>
+    </div>
+
+    <div class="d-grid gap-2 d-md-block">
+        <button class="btn btn-primary" type="button" id="button-Save" onclick="saveCoordinatesOfSecondCanvas()">Save</button>
+        <button class="btn btn-primary" type="button" id="button-Erase" onclick="eraseSecondCanvas()">Erase</button>
+    </div>
+
+    
+    
+    
+
+<script>
+
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let points = [];
+
+    canvas.addEventListener('mousedown', startDrawingOnSecondCanvas);
+    canvas.addEventListener('touchstart', startDrawingOnSecondCanvas);
+
+    canvas.addEventListener('mouseup', handleEndOnSecondCanvas);
+    canvas.addEventListener('touchend', handleEndOnSecondCanvas);
+
+
+
+    // Extrahiere den Font-Namen aus den Query-Parametern
+    var fontName = getParameterByName('fontname');
+
+    // Funktion zur Extraktion von Query-Parametern
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function startDrawingOnSecondCanvas(e) {
+        e.preventDefault(); // Verhindere das Standard-Touch-Verhalten (z.B. Scrollen)
+        isDrawing = true;
+        const { x, y } = getEventCoordinatesOfSecondCanvas(e);
+        lastX = x;
+        lastY = y;
+        points.push({ x, y, isNewLine: true });
+    }
+
+    function getEventCoordinatesOfSecondCanvas(e) {
+        if (e.type === 'mousedown') {
+            return { x: e.offsetX, y: e.offsetY };
+        } else if (e.type === 'touchstart' || e.type === 'touchmove') {
+            const touch = e.touches[0];
+            return { x: touch.clientX - canvas.getBoundingClientRect().left, y: touch.clientY - canvas.getBoundingClientRect().top };
+        }
+    }
+
+    function handleEndOnSecondCanvas() {
+        isDrawing = false;
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+
+        writeText(e.offsetX, e.offsetY);
+        lastX = e.offsetX;
+        lastY = e.offsetY;
+        points.push({ x: lastX, y: lastY, isNewLine: false }); // isNewLine für den Punkt setzen
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Verhindere das Standard-Touch-Verhalten (z.B. Scrollen)
+        if (!isDrawing) return;
+
+        const { x, y } = getEventCoordinatesOfSecondCanvas(e);
+
+        writeText(x, y);
+        points.push({ x, y, isNewLine: false });
+    });
+
+
+    function writeText(x, y) {
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        lastX = x;
+        lastY = y;
+    }
+
+
+    function saveCoordinatesOfSecondCanvas() {
+        let textsample = 1;
+
+        // Lese den Tabellennamen aus dem Eingabefeld aus
+
+        console.log(fontName); // Überprüfe, ob der Tabellenname korrekt ist
+        console.log(textsample); // Überprüfe, ob der Buchstabe korrekt ist
+        console.log(points); // Überprüfe, ob die Koordinaten korrekt sind
+
+        let newLine = isDrawing;
+
+        fetch('/saveText', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ font_name: fontName, text_sample: textsample, points: points, new_line: newLine })
+        })
+        .then(response => response.json())
+        .then(data => {console.log(data);})
+        .catch(error => console.error('Error saving coordinates:', error));
+
+
+        // Zurücksetzen der Punkte nach dem Speichern
+        points = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function eraseSecondCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Zurücksetzen der Punkte ohne den Buchstaben zu speichern
+        points = [];
+    }
+
+
+</script>
+</body>
+</html>

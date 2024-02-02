@@ -17,11 +17,27 @@ class CreatingFont(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     new_line = db.Column(db.Boolean, nullable=False, default=False)
 
+class TextSamples(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    font_name = db.Column(db.String(50), nullable=False)
+    text_sample = db.Column(db.Integer, nullable=False)
+    x = db.Column(db.Integer, nullable=False)
+    y = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    new_line = db.Column(db.Boolean, nullable=False, default=False)
+
 def create_table_if_not_exists():
     if not db.inspect(db.engine).has_table('CreatingFont'):
         with app.app_context():
             db.create_all()
+    if not db.inspect(db.engine).has_table('TextSamples'):
+        with app.app_context():
+            db.create_all()
 
+
+@app.route('/mouse_tracking/text_input')
+def textinput():
+    return render_template('textInput.html')
 
 @app.route('/mouse_tracking')
 def tracking():
@@ -48,6 +64,26 @@ def save_coordinates():
         db.session.add(new_drawing)
     db.session.commit()
 
+    return jsonify({'message': 'Koordinaten gespeichert'})
+
+@app.route('/saveText', methods=['POST'])
+def save_coordinates_Text():
+    data = request.json
+    # print("Received data:", data)  # Debug-Ausgabe
+    font_name = data['font_name']
+    text_sample = data['text_sample']
+    points = data['points']
+
+    create_table_if_not_exists()
+
+    for i, point in enumerate(points):
+        x = point['x']
+        y = point['y']
+        isNewLine = point.get('isNewLine', False) # isNewLine aus dem Punkt abrufen (Standardwert ist False)
+        
+        new_textInput = TextSamples(font_name=font_name, text_sample=text_sample, x=x, y=y, new_line=isNewLine)
+        db.session.add(new_textInput)
+    db.session.commit()
     return jsonify({'message': 'Koordinaten gespeichert'})
 
 @app.route('/tracked_letters', methods=['GET'])

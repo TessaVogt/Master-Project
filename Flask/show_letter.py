@@ -28,12 +28,12 @@ def plot_letter(new_line_indices, data_last_letter, letter):
 
 
 def show_letter(font_name, letter):
-    data = show_db.get_data_from_db(font_name, 'instance/coords.db')
+    data = show_db.get_letterdata_from_db(font_name, 'instance/coords.db')
     new_line_indices, data_last_letter = show_db.get_data_for_letter(data, letter)
     plot_letter(new_line_indices, data_last_letter, letter)
     
 
 if __name__ == "__main__":
     font_name = 'Ipad'
-    letter = "A"
+    letter = "P"
     show_letter(font_name, letter)
