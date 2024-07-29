@@ -1,0 +1,19 @@
+This study focuses on developing a system 
+that enables the Anycubic i3 Mega 3D 
+printer to write texts with a ballpoint 
+pen on a suitable medium. A pen holder was 
+designed using CAD to attach the pen to
+the printer's nozzle, and Python code was 
+implemented to read a proprietary font 
+file and generate print instructions for 
+the 3D printer based on the given font file. 
+Additionally, the personal handwriting of 
+multiple individuals was captured, and custom 
+font files were created to replicate their 
+individual handwriting. These custom font 
+files replaced the predefined font file, 
+enabling the 3D printer to write texts in 
+personalized handwriting. The success of 
+this implementation was evaluated by 
+comparing the handwritten texts with the 
+texts written by the 3D printer.

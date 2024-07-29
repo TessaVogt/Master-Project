@@ -58,7 +58,8 @@ def save_coordinates():
     for i, point in enumerate(points):
         x = point['x']
         y = point['y']
-        isNewLine = point.get('isNewLine', False) # isNewLine aus dem Punkt abrufen (Standardwert ist False)
+        # get the isNewLine value from the point (default value is False)
+        isNewLine = point.get('isNewLine', False)
         
         new_drawing = CreatingFont(font_name=font_name, letter=letter, x=x, y=y, new_line=isNewLine)
         db.session.add(new_drawing)
@@ -69,7 +70,7 @@ def save_coordinates():
 @app.route('/saveText', methods=['POST'])
 def save_coordinates_Text():
     data = request.json
-    # print("Received data:", data)  # Debug-Ausgabe
+    # print("Received data:", data)  # Debug
     font_name = data['font_name']
     text_sample = data['text_sample']
     points = data['points']
@@ -79,7 +80,8 @@ def save_coordinates_Text():
     for i, point in enumerate(points):
         x = point['x']
         y = point['y']
-        isNewLine = point.get('isNewLine', False) # isNewLine aus dem Punkt abrufen (Standardwert ist False)
+        # get the isNewLine value from the point (default value is False)
+        isNewLine = point.get('isNewLine', False)
         
         new_textInput = TextSamples(font_name=font_name, text_sample=text_sample, x=x, y=y, new_line=isNewLine)
         db.session.add(new_textInput)
@@ -100,8 +102,6 @@ def create_plot():
     font_name = request.args.get('font_name')
 
     plot_path = show_db.main(font_name)
-
-    # Annahme: plot_path enthält den Pfad zum generierten Plot
     return jsonify({'plot_path': plot_path})
 
 

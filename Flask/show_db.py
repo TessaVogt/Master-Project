@@ -5,55 +5,55 @@ from datetime import datetime, timedelta
 
 
 def get_letterdata_from_db(font_name, db_path):
-    # Verbindung zur Datenbank herstellen
+    # connect to the database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    # Datenpunkte für den angegebenen Buchstaben abrufen
+    # get data points for the specified letter
     cursor.execute(f"SELECT letter, created_at, new_line, x, y FROM creating_font WHERE font_name = '{font_name}'")
     data = cursor.fetchall()
-    # Verbindung zur Datenbank schließen
+    # close connection to the database
     conn.close()
     return data
 
 def get_sampletextdata_from_db(font_name, db_path):
-    # Verbindung zur Datenbank herstellen
+    # get connection to the database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    # Datenpunkte für den angegebenen Buchstaben abrufen
+    # get data points for the specified text sample
     cursor.execute(f"SELECT text_sample, created_at, new_line, x, y FROM text_samples WHERE font_name = '{font_name}'")
     data = cursor.fetchall()
-    # Verbindung zur Datenbank schließen
+    # close connection
     conn.close()
     return data
 
 
 def get_data_for_letter(data, letter):
     data_letter = [point for point in data if point[0] == letter]
-    # extrahiere letzte Eingabe
+    # extract the last input
     created_at_dates = [point[1] for point in data_letter]
     last_date = max(created_at_dates)
     data_last_letter = [point for point in data_letter if point[1] == last_date]
-    # new_line-Werte ausgeben 
+    # give new_line values
     new_line_indices = [i for i, point in enumerate(data_last_letter) if point[2] == True]
-    # entferne die spalten mit letter und created_at und new_line
+    # delete the columns with letter and created_at and new_line
     data_last_letter = [point[3:] for point in data_last_letter]
     return new_line_indices, data_last_letter
 
 
 def get_data_for_textsample(data, text_sample):
     data_sampletext = [point for point in data if point[0] == text_sample]
-    # extrahiere letzte Eingabe
+    # extract the last input
     created_at_dates = [point[1] for point in data_sampletext]
     last_date_str = max(created_at_dates)
     last_datetime = datetime.strptime(last_date_str, '%Y-%m-%d %H:%M:%S.%f')
-    # Definiere den Zeitbereich
+    # define the time range
     time_range = timedelta(minutes=10)
     lower_bound = last_datetime - time_range
-    # Extrahiere alle Daten nach dem unteren Zeitlimit
+    # Extract all points that are in the time range
     data_last = [point for point in data_sampletext if datetime.strptime(point[1], '%Y-%m-%d %H:%M:%S.%f') >= lower_bound]
-    # new_line-Werte ausgeben 
+    # give new_line values 
     new_line_indices = [i for i, point in enumerate(data_last) if point[2] == True]
-    # entferne die spalten mit sampletext und created_at und new_line
+    # delete the columns with text_sample and created_at and new_line
     data_last = [point[3:] for point in data_last]
     return new_line_indices, data_last
 
@@ -74,10 +74,10 @@ def plot_subplot(ax, new_line_indices, data_last_letter, letter):
     else:
         ax.plot(x_values, y_values, label=letter)
 
-    ax.invert_yaxis()  # Hier wird die Y-Achse invertiert
+    ax.invert_yaxis()  # invert the y-axis
     # ax.set_xlabel('X-Koordinate')
     # ax.set_ylabel('Y-Koordinate')
-    # ax.set_title(f'Koordinatenpunkte für Buchstabe {letter}')
+    # ax.set_title(f'Coordinate points for {letter}')
     ax.set_title(f'{letter}')
     ax.set_ylim(300, -20)
     ax.set_xlim(0, 500)
@@ -93,8 +93,6 @@ def main(font_name):
     for i, char in enumerate(asciiList):
         new_line_indices, data_last_letter = get_data_for_letter(data, char)
         plot_subplot(axs[i//9, i%9], new_line_indices, data_last_letter, char)
-
-    # Platz zwischen den Plots hinzufügen, falls gewünscht
     plt.tight_layout()
 
     # save Plot

@@ -1,28 +1,25 @@
 import sqlite3
-from datetime import datetime, timedelta
 
 def get_data_from_db(font_name, db_path):
-    # Verbindung zur Datenbank herstellen
+    # connect to the database
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    # Datenpunkte für den angegebenen Buchstaben abrufen
+    # get all data points for the specified font
     cursor.execute(f"SELECT letter, created_at, new_line, x, y FROM creating_font WHERE font_name = '{font_name}'")
     data = cursor.fetchall()
-    # Verbindung zur Datenbank schließen
+    # close the connection
     conn.close()
     return data
 
 
 def get_data_for_letter(data, letter):
     data_letter = [point for point in data if point[0] == letter]
-    # extrahiere letzte Eingabe
+    # extract the last input
     created_at_dates = [point[1].split('.')[0] for point in data_letter]
     last_date = max(created_at_dates)
-    
-    # Filtere alle Punkte mit der gleichen created_at-Zeit (ohne Millisekunden)
+    # filter all points with the same created_at time (without milliseconds)
     data_last_letter = [point for point in data_letter if point[1].split('.')[0] == last_date]
-  
-    # entferne die spalten mit letter und created_at
+    # delete the columns with letter and created_at
     data_last_letter = [point[2:] for point in data_last_letter]
     return data_last_letter
 
@@ -67,7 +64,7 @@ def create_font_input(data, letter):
 
 
 def prepare_fontfile(font_name):
-    with open("handwriting_" + font_name + ".fnt", "w") as f:
+    with open("fonts/handwriting_" + font_name + ".fnt", "w") as f:
         # delete previous input in file and print space into font file
         f.write("! > <\nC 32 30\n")
     return True
@@ -99,5 +96,5 @@ def create_fnt(font_name):
 
 
 if __name__ == "__main__":
-    font_name = "Max"
+    font_name = "Tessa"
     create_fnt(font_name)

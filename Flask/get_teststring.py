@@ -1,11 +1,11 @@
 import pandas as pd
 
 def get_teststring(testsample_number):
-    # Lese die Excel-Datei ein
+    # get the excel file path
     excel_file_path = 'static/Testsamples.xlsx'
     df = pd.read_excel(excel_file_path)
-    # Filtere den DataFrame nach der gesuchten Zahl in der ersten Spalte
+    # filter for the number in the first column
     ergebnis_df = df[df['Number'] == testsample_number]
-    # Erhalte den Teststring aus der zweiten Spalte des Ergebnis-DataFrames
+    # extract the teststring from the second column of the result dataframe
     teststring = ergebnis_df['Teststring'].iloc[0]
     return teststring

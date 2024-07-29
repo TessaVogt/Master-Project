@@ -39,7 +39,7 @@ def writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile):
         fgCodeFile.write("G1 Y{:05.3f} X{:05.3f}\n".format(fX + sPnt[sFnt[bChr].wOff + wI].nX * wFontScale / 100.0,
                                                             fY - sPnt[sFnt[bChr].wOff + wI].nY * wFontScale / 100.0))
         wPlot += 1
-        return wPlot
+    return wPlot
 
 
 def errorinfo():
@@ -51,14 +51,8 @@ def errorinfo():
           "\tgcode-file -> GCODE file for 3D printer\n")
 
 # --------------------------------------------------------------------------------------------
-def main(defFile, fontFile, textFile, gCodeFile):
+def create_gcode(defFile, fontFile, textFile, gCodeFile):
     print("TEXTPLOT version 0.1, Copyright (C) 2023 Tessa Vogt, Muenster, Germany")
-
-    if sys.gettrace() is None and len(sys.argv) != 5: # not enough input arguments
-        print("Not enough input arguments:")
-        print("Please use: ")
-        errorinfo()
-        return False
     
     # Config File Definition -----------------------------------------------------------------
     try:
@@ -201,7 +195,7 @@ def main(defFile, fontFile, textFile, gCodeFile):
 
     # Generate G-Code from Text File ---------------------------------------------------------------
     try:
-        fTextFile = open(textFile, "r")
+        fTextFile = open(textFile, "r", encoding="utf-8")
     except FileNotFoundError:
         sys.stderr.write("Can't open text file '{}'\n".format(textFile))
         sys.exit(1)
@@ -253,43 +247,43 @@ def main(defFile, fontFile, textFile, gCodeFile):
                     fX += sFnt[bChr].wWid * wFontScale / 100.0
                 # --------------------------------------------------------------------------
                 else: # char not defined
-                    if bChr == 132: # ä
+                    if bChr == 228: # ä
                         bChr_list = [97, 101] # a, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                                 
-                    elif bChr == 148: # ö
+                    elif bChr == 246: # ö
                         bChr_list = [111, 101] # o, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                     
-                    elif bChr == 129: # ü
+                    elif bChr == 252: # ü
                         bChr_list = [117, 101] # u, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                     
-                    elif bChr == 142: # Ä
+                    elif bChr == 196: # Ä
                         bChr_list = [65, 101] # A, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                     
-                    elif bChr == 153: # Ö
+                    elif bChr == 214: # Ö
                         bChr_list = [79, 101] # O, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
 
-                    elif bChr == 154: # Ü
+                    elif bChr == 220: # Ü
                         bChr_list = [85, 101] # U, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
 
-                    elif bChr == 225: # ß
+                    elif bChr == 223: # ß
                         bChr_list = [115, 115] # s, s
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
@@ -323,20 +317,16 @@ def main(defFile, fontFile, textFile, gCodeFile):
 
 # ---------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    # differentiate between running in debug mode or not
-    if sys.gettrace() is not None:
-        # Debug-Modus
-        defFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/default.ini'
-        fontFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/test.fnt'
-        textFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/test.txt'
-        gCodeFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/testgCode.gcode'
-        main(defFile, fontFile, textFile, gCodeFile)
-        
-    else:
-        parser = argparse.ArgumentParser()
-        parser.add_argument("defFile", help="Path to the definition file")
-        parser.add_argument("fontFile", help="Path to the font file")
-        parser.add_argument("textFile", help="Path to the text file")
-        parser.add_argument("gCodeFile", help="Path to the output GCode file")
-        args = parser.parse_args()
-        main(args.defFile, args.fontFile, args.textFile, args.gCodeFile)
+    # change these according to your needs
+    fontname = 'Tessa'
+    defFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/default.ini'
+    # textFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/text_sample.txt'
+    textFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/abstract.txt'	
+
+
+    # DON'T CHANGE THESE
+    # fontFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/test.fnt'
+    fontFile = f'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/Flask/fonts/handwriting_{fontname}.fnt'
+    gCodeFile = f'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/{fontname}_gCode.gcode'
+    create_gcode(defFile, fontFile, textFile, gCodeFile)
+    

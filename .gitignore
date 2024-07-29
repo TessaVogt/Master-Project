@@ -1,7 +1,6 @@
 
-Buchstaben2.jpg
-handwirting/picsLetter/
 Flask/env/
 Flask/fonts
+Flask/__pycache__
 
-createFont/__pycache__
+textplot/__pycache__

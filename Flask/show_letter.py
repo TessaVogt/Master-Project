@@ -1,4 +1,3 @@
-import sqlite3
 import matplotlib.pyplot as plt
 import show_db
 
@@ -19,7 +18,7 @@ def plot_letter(new_line_indices, data_last_letter, letter):
     else:
         plt.plot(x_values, y_values, label=letter)
 
-    plt.gca().invert_yaxis()  # Hier wird die Y-Achse invertiert
+    plt.gca().invert_yaxis()  # invert the y-axis
     plt.title(f'{letter}')
     plt.ylim(300, -20)
     plt.xlim(0, 500)

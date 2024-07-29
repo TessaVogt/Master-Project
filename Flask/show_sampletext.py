@@ -1,4 +1,3 @@
-import sqlite3
 import matplotlib.pyplot as plt
 import show_db
 import numpy as np
@@ -7,7 +6,7 @@ import numpy as np
 
 def plot_sampletext(new_line_indices, data_last, font_name, text_sample, scale=1, save=False):
     if scale != 1:
-        # Umwandlung in float und Skalierung
+        # change the data type to float and multiply with the scale
         data_last = np.array(data_last, dtype=float) * scale
     x_values = [point[0] for point in data_last]
     y_values = [point[1] for point in data_last]
@@ -23,16 +22,16 @@ def plot_sampletext(new_line_indices, data_last, font_name, text_sample, scale=1
     else:
         plt.plot(x_values, y_values, label=text_sample)
 
-    plt.gca().invert_yaxis()  # Hier wird die Y-Achse invertiert
+    plt.gca().invert_yaxis()  # invert the y-axis
     plt.title(f'font_name = {font_name}, text_sample = {text_sample}, scale = {scale}')
     plt.ylim(900*scale, -20)
     plt.xlim(0, 1200*scale)
     plt.show()
 
     if save is True:
-        # Speichern des Plots
+        # save the plot as a png file
         plt.savefig(f'static/figures/plot_{font_name}_{text_sample}.png')
-        plt.close()  # Schließe das Plot-Fenster nach dem Speichern
+        plt.close()  # close the plot
 
 
 
