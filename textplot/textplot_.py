@@ -39,7 +39,7 @@ def writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile):
         fgCodeFile.write("G1 Y{:05.3f} X{:05.3f}\n".format(fX + sPnt[sFnt[bChr].wOff + wI].nX * wFontScale / 100.0,
                                                             fY - sPnt[sFnt[bChr].wOff + wI].nY * wFontScale / 100.0))
         wPlot += 1
-        return wPlot
+    return wPlot
 
 
 def errorinfo():
@@ -201,7 +201,7 @@ def main(defFile, fontFile, textFile, gCodeFile):
 
     # Generate G-Code from Text File ---------------------------------------------------------------
     try:
-        fTextFile = open(textFile, "r")
+        fTextFile = open(textFile, "r", encoding="utf-8")
     except FileNotFoundError:
         sys.stderr.write("Can't open text file '{}'\n".format(textFile))
         sys.exit(1)
@@ -253,43 +253,43 @@ def main(defFile, fontFile, textFile, gCodeFile):
                     fX += sFnt[bChr].wWid * wFontScale / 100.0
                 # --------------------------------------------------------------------------
                 else: # char not defined
-                    if bChr == 132: # ä
+                    if bChr == 228: # ä
                         bChr_list = [97, 101] # a, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                                 
-                    elif bChr == 148: # ö
+                    elif bChr == 246: # ö
                         bChr_list = [111, 101] # o, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                     
-                    elif bChr == 129: # ü
+                    elif bChr == 252: # ü
                         bChr_list = [117, 101] # u, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                     
-                    elif bChr == 142: # Ä
+                    elif bChr == 196: # Ä
                         bChr_list = [65, 101] # A, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
                     
-                    elif bChr == 153: # Ö
+                    elif bChr == 214: # Ö
                         bChr_list = [79, 101] # O, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
 
-                    elif bChr == 154: # Ü
+                    elif bChr == 220: # Ü
                         bChr_list = [85, 101] # U, e
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
                                 wPlot = writeCharInGCode(bChr, sFnt, sPnt, fX, fY, wPlot, fgCodeFile)
 
-                    elif bChr == 225: # ß
+                    elif bChr == 223: # ß
                         bChr_list = [115, 115] # s, s
                         for bChr in bChr_list:
                             if sFnt[bChr].wWid:  # The char is defined
@@ -327,9 +327,10 @@ if __name__ == "__main__":
     if sys.gettrace() is not None:
         # Debug-Modus
         defFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/default.ini'
-        fontFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/test.fnt'
+        # fontFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/test.fnt'
+        fontFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/Flask/handwriting_Tessa.fnt'
         textFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/test.txt'
-        gCodeFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/testgCode.gcode'
+        gCodeFile = 'c:/Users/tvogt/OneDrive/Dokumente/GitHub/Master-Project/textplot/Test_gCode.gcode'
         main(defFile, fontFile, textFile, gCodeFile)
         
     else:

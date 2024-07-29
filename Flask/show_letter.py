@@ -34,6 +34,6 @@ def show_letter(font_name, letter):
     
 
 if __name__ == "__main__":
-    font_name = 'Ipad'
-    letter = "P"
+    font_name = 'Laptop'
+    letter = "D"
     show_letter(font_name, letter)

@@ -74,7 +74,7 @@ def prepare_fontfile(font_name):
 
 
 def write_letter_to_file(coordsCode, font_name):
-    with open("handwriting_" + font_name + ".fnt", "a+") as f:
+    with open("fonts/handwriting_" + font_name + ".fnt", "a+") as f:
         first_entry = coordsCode[0]
         ascii_char = first_entry[1]
         f.write("! >{}<\n".format(chr(ascii_char)))
@@ -85,12 +85,8 @@ def write_letter_to_file(coordsCode, font_name):
     return True
 
 
-
-
-
-if __name__ == "__main__":
+def create_fnt(font_name):
     db_path = 'instance/coords.db'
-    font_name = "Ipad"
     data = get_data_from_db(font_name, db_path)
     prepare_fontfile(font_name)
     # asciiList = ["a"]
@@ -100,3 +96,8 @@ if __name__ == "__main__":
         scaled_letter = scale_letter(data_last_letter)
         font_input = create_font_input(scaled_letter, char)
         write_letter_to_file(font_input, font_name)
+
+
+if __name__ == "__main__":
+    font_name = "Max"
+    create_fnt(font_name)

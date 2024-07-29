@@ -58,7 +58,7 @@
 
     <form class="input-group mb-3 button_lo1" method="POST">
         <input type="text" id="font-name-input" class="form-control" placeholder="Font Name" aria-label="Font Name" aria-describedby="button-addon2" oninput="fetchTrackedLetters()">
-        <input type="text" id="letter-input" class="letter-input" placeholder="Letter" data-points="[]" aria-describedby="button-addon2">
+        <select id="letter-input" class="letter-input" aria-describedby="button-addon2"></select>
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="saveCoordinates()">Save</button>
         <button class="btn btn-outline-secondary" type="button" id="button-addon3" onclick="eraseCanvas()">Erase</button>
     </form>
@@ -86,6 +86,29 @@
     
 
 <script>
+
+    // für das dropdown menu
+    document.addEventListener('DOMContentLoaded', () => {
+        const letterInput = document.getElementById('letter-input');
+        const asciiList = [];
+
+        for (let i = 33; i <= 35; i++) asciiList.push(i);
+        asciiList.push(37, 38);
+        for (let i = 40; i <= 41; i++) asciiList.push(i);
+        for (let i = 43; i <= 59; i++) asciiList.push(i);
+        for (let i = 63; i <= 90; i++) asciiList.push(i);
+        asciiList.push(95);
+        for (let i = 97; i <= 122; i++) asciiList.push(i);
+        asciiList.push(196, 214, 220, 223, 228, 246, 252);
+
+        asciiList.forEach(num => {
+            const option = document.createElement('option');
+            option.value = String.fromCharCode(num);
+            option.textContent = String.fromCharCode(num);
+            letterInput.appendChild(option);
+        });
+    });
+
     // für ersten Canvas
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
